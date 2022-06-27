@@ -123,8 +123,7 @@ class Window :
     '''
     def get_uuid(self):
         print('GETING UUID')
-        windows = subprocess.check_output('wmic csproduct get uuid').decode().split('\n')[1].strip()
-        #linux = subprocess.check_output('hal-get-property --udi /org/freedesktop/Hal/devices/computer --key system.hardware.uuid').decode().split('\n')[1].strip()
+        windows = ""
         print('UUID- WINDOWS:', windows, ' LINUX: ', 'linux')
 
     def TableOps(self, i, data):
