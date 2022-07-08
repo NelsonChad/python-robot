@@ -165,7 +165,6 @@ class Window :
                                         speed=1.0, color=(0, 168, 132))
         self.spinner.start() # starts spinning
 
-
     def select_account():
         print('TESTE')
 
@@ -197,7 +196,6 @@ class Window :
                 print('SENNHA OU EMAIL INCORRECTOS')
         except Exception as e:
             pass
-
     
     def text_changed(self):
         print("text changed")
@@ -205,7 +203,6 @@ class Window :
 
     def kill_thread(self):
         threading.currentThread()
-
 
     def on_combobox_changed(self, value):
         print("combobox changed", value)
@@ -215,7 +212,6 @@ class Window :
         if value == 1:
             self.API.change_balance('REAL')
             self.updateProfile()
-
 
     def updateProfile(self):
         self.PROFILE = self.profile()
@@ -324,7 +320,7 @@ class Window :
     '''
         ROBOT Functions begin here ...
     '''
-
+    #login
     def login(self, email, password) :
         print('**************LOG**************')
         try:
@@ -349,7 +345,7 @@ class Window :
         except ValueError as ve:
             print('Error::: ',ve)
         
-
+    #####
     def config_robo(self, TAKEPROFIT_PERC, DAY_LOSS_TARGET, SOROS_HAND):
         pass
 
@@ -369,55 +365,6 @@ class Window :
         print('>>>>>CRIADO EM: ', x['created'])
 
         print('\a')
-
-    def getCandles(self, goal, minute): 
-        timeframe = int(minute)*60
-
-        ma_type200 = 200
-        ma_type100 = 100
-        ma_type50 = 50
-        ma_type20 = 20
-        
-        trend = 0
-
-        candles200 = self.API.get_candles(goal,timeframe,ma_type200,time.time())
-        candles100 = self.API.get_candles(goal,timeframe,ma_type100,time.time())
-        candles50 = self.API.get_candles(goal,timeframe,ma_type50,time.time())
-        candles20 = self.API.get_candles(goal,timeframe,ma_type20,time.time())
-
-        close200 = 0
-        close100 = 0
-        close50 = 0
-        close20 = 0
-
-        for candle in candles200:
-            close200 = close200 + candle["close"] 
-        for candle in candles100:
-            close100 = close100 + candle["close"] 
-        for candle in candles50:
-            close50 = close50 + candle["close"] 
-        for candle in candles20:
-            close20 = close20 + candle["close"] 
-
-        ma200 = close200/ma_type200
-        ma100 = close100/ma_type100
-        ma50 = close50/ma_type50
-        ma20 = close20/ma_type20
-
-        if((ma200 > ma100) and (ma100 > ma50) and (ma50 > ma20)):
-            trend = 'down'
-        elif(bool(ma200 < ma100) and bool(ma100 < ma50) and bool(ma50 < ma20)):
-            trend = 'up'
-        else:
-            trend = 'lat'
-        
-        '''
-        if trend == 'up': print("TREND: ", Fore.GREEN+ str(trend)+Fore.RESET)
-        if trend == 'down': print("TREND: ", Fore.RED+ str(trend)+Fore.RESET)
-        elif trend == 'lat': print("TREND: ", Fore.YELLOW+ str(trend)+Fore.RESET)
-        '''
-
-        return trend
 
     #-----------------------------CATALOGADOR-------------------------
     def cataloga(self, par, dias, per_cal, per_put, timeframe):
@@ -474,7 +421,7 @@ class Window :
             print('ERRO AO CATALOGAR: ', e.with_traceback)
             self.alert('ERRO AO GERAR SINAIS: ', e)
             
-    #
+    #start catalogation
     def start_catalog(self):
         try:
             print('INICIANDO CATALOGACAO')
@@ -544,7 +491,6 @@ class Window :
             print('ERRO AO CATALOGAR: ', e.with_traceback)
             self.alert('ERRO AO GERAR SINAIS: ', e)
 
-
     #buy method
     def buyBinaryListFile(self, Entrada,Paridade,Direcao,Duracao,Hora):
         print('***************SINAL**************')
@@ -553,27 +499,10 @@ class Window :
         #print('INROW_WINS GLOBAL: ', INROW_WINS, ' INROW_LOSES GLOBAL: ', INROW_LOSES)
 
         isOperated = False
-        inTrend = False
+        inTrend = True
         stt = False
         id = 0
         _lucro = 0
-
-        trend = self.getCandles(Paridade, Duracao)
-        
-        if (trend == 'up') and (Direcao == 'CALL'):
-            inTrend = True
-            print(Fore.GREEN+'\nTENDENCIA DE ALTA')
-        elif (trend == 'down') and (Direcao == 'PUT'):
-            inTrend = True
-            print(Fore.RED+'\nTENDENCIA DE BAIXA')
-        elif (trend == 'lat'):
-            inTrend = True
-            print(Fore.BLUE+'\nLATERALIZACAO')
-        else:
-            print(Fore.RED+'\n!!CONTRA A TENDENCIA!!')
-            self.tela.label_logging.setText("!!CONTRA A TENDENCIA!!")
-            print('Trend: ', trend)
-
 
         self.PAYOUT_B = float(self.PAYOUT)/100
         self.API.subscribe_strike_list(Paridade, int(Duracao))
