@@ -478,10 +478,8 @@ class Window :
                         canShed =True
                         if horario in toStoreTime:
                             pass
-                           #print('HORA JA EXISTE ',horario)
                         else:
-                            print('Primeira vx ',horario)
-                            #open(filename,'a').write(horario + ',' + par + ','+ catalogacao[par][horario]['dir'].strip() + ','+ str(timeframe) +'\n') #10:00,EURUSD,CALL
+                            open(filename,'a').write(horario + ',' + par + ','+ catalogacao[par][horario]['dir'].strip() + ','+ str(timeframe) +'\n') #10:00,EURUSD,CALL
                         
                         toStoreTime.append(horario) #add each time to array
                             
