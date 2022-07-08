@@ -352,7 +352,6 @@ class Window :
     #-----------------------------SIGMAL DATA------------------------
     def profile(self):
         prof = json.loads(json.dumps(self.API.get_profile_ansyc()))
-        #print('PERFIL: ',prof)
         return prof
 
     #--------------------------------IQ------------------------------
@@ -465,7 +464,6 @@ class Window :
                 for horario in sorted(catalogacao[par]):
                     ok = False
                     msg = ''
-                    toStoreTime.append(horario) #add each time to array
 
                     if catalogacao[par][horario]['%'] >= percentage:
                         ok = True
@@ -478,9 +476,14 @@ class Window :
                         print(msg)
 
                         canShed =True
-
-                        #from here              
-                        open(filename,'a').write(horario + ',' + par + ','+ catalogacao[par][horario]['dir'].strip() + ','+ str(timeframe) +'\n') #10:00,EURUSD,CALL
+                        if horario in toStoreTime:
+                            pass
+                           #print('HORA JA EXISTE ',horario)
+                        else:
+                            print('Primeira vx ',horario)
+                            #open(filename,'a').write(horario + ',' + par + ','+ catalogacao[par][horario]['dir'].strip() + ','+ str(timeframe) +'\n') #10:00,EURUSD,CALL
+                        
+                        toStoreTime.append(horario) #add each time to array
                             
             print('\nTOTAL DE SINAIS: ', Fore.GREEN + str(total_sinais))
             self.management(soros)
