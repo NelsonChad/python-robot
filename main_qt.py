@@ -77,7 +77,9 @@ class Window :
         self.tela.comboBoxSorosLevel.addItems(['2','3'])
         self.loginUI.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Password)
 
-        #valor default stop
+        #Debug
+        self.loginUI.textEditEmail.setText('tonnylson.chad@gmail.com')
+        self.loginUI.lineEditPassword.setText('nelsonchad1234')
         self.tela.textEditStoploss.setPlainText('20')
 
         #Init tables
@@ -276,17 +278,20 @@ class Window :
         pass
 
     def updateScreen(self):
-        if(self.tela.textEditStoploss.toPlainText() != '' and float(self.tela.textEditStoploss.toPlainText()) <= 20):
-            try:   
-                self.TAKEPROFIT_PERC = float(self.tela.textEditStoploss.toPlainText())
-                print('PPP: ',self.TAKEPROFIT_PERC)
-                money = (float(self.TAKEPROFIT_PERC)/100) * self.BANCA
-                self.DAY_LOSS_TARGET = money
+        if(self.tela.textEditStoploss.toPlainText() != ''):
+            try:  
+                if(float(self.tela.textEditStoploss.toPlainText()) <= 20):
+                    self.TAKEPROFIT_PERC = float(self.tela.textEditStoploss.toPlainText())
+                    #print('PPP: ',self.TAKEPROFIT_PERC)
+                    money = (float(self.TAKEPROFIT_PERC)/100) * self.BANCA
+                    self.DAY_LOSS_TARGET = money
 
-                #TODAY_PROFIT
-                self.tela.label_logging.setText('Robo iniciado...')
-                self.tela.labelProfit.setText("${:,.2f}".format(self.DAY_LOSS_TARGET))
-                self.tela.label_stop.setText("${:,.2f}".format(money))
+                    #TODAY_PROFIT
+                    self.tela.label_logging.setText('Robo iniciado...')
+                    self.tela.labelProfit.setText("${:,.2f}".format(self.DAY_LOSS_TARGET))
+                    self.tela.label_stop.setText("${:,.2f}".format(money))
+                else:
+                    self.tela.textEditStoploss.setText('20')
             except ValueError as ve:
                 self.tela.textEditStoploss.setText('1')
                 print('Error::: ',ve)
