@@ -77,9 +77,7 @@ class Window :
         self.tela.comboBoxSorosLevel.addItems(['2','3'])
         self.loginUI.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Password)
 
-        #Debug
-        self.loginUI.textEditEmail.setText('tonnylson.chad@gmail.com')
-        self.loginUI.lineEditPassword.setText('nelsonchad1234')
+        #valor default stop
         self.tela.textEditStoploss.setPlainText('20')
 
         #Init tables
@@ -137,7 +135,7 @@ class Window :
         self.tela.tableWidgetOps.setItem(i,2,  QtWidgets.QTableWidgetItem("${:,.2f}".format(data[3]), 0))
         self.tela.tableWidgetOps.setItem(i,3,  QtWidgets.QTableWidgetItem(str(data[1]), 0))
         self.tela.tableWidgetOps.setItem(i,4,  QtWidgets.QTableWidgetItem(str(data[4]), 0))
-        self.tela.tableWidgetOps.setColumnWidth(2,600) # and also lower values
+        #self.tela.tableWidgetOps.setColumnWidth(2,600) # and also lower values
 
 
         if data[4] == 'LOSS':
@@ -263,7 +261,7 @@ class Window :
         alert.setIcon(QtWidgets.QMessageBox.Warning)
         alert.setWindowTitle(title)
         alert.setText(message)
-        x = alert.exec_()  # this will show our messagebox
+        alert.exec_()  # this will show our messagebox
 
     def showToaster(self, message):
         desktop = True
@@ -278,16 +276,22 @@ class Window :
         pass
 
     def updateScreen(self):
-        self.TAKEPROFIT_PERC = self.tela.textEditStoploss.toPlainText()
-        print('PPP: ',self.TAKEPROFIT_PERC)
-        money = (float(self.TAKEPROFIT_PERC)/100) * self.BANCA
-        self.DAY_LOSS_TARGET = money
+        if(self.tela.textEditStoploss.toPlainText() != '' and float(self.tela.textEditStoploss.toPlainText()) <= 20):
+            try:   
+                self.TAKEPROFIT_PERC = float(self.tela.textEditStoploss.toPlainText())
+                print('PPP: ',self.TAKEPROFIT_PERC)
+                money = (float(self.TAKEPROFIT_PERC)/100) * self.BANCA
+                self.DAY_LOSS_TARGET = money
 
-        #TODAY_PROFIT
-        self.tela.label_logging.setText('Robo iniciado...')
-        self.tela.labelProfit.setText("${:,.2f}".format(self.DAY_LOSS_TARGET))
-        self.tela.label_stop.setText("${:,.2f}".format(money))
-        #self.tela.label_sl.setText(self.TAKEPROFIT_PERC+'%')
+                #TODAY_PROFIT
+                self.tela.label_logging.setText('Robo iniciado...')
+                self.tela.labelProfit.setText("${:,.2f}".format(self.DAY_LOSS_TARGET))
+                self.tela.label_stop.setText("${:,.2f}".format(money))
+            except ValueError as ve:
+                self.tela.textEditStoploss.setText('1')
+                print('Error::: ',ve)
+        else:
+            self.tela.textEditStoploss.setText('1')
 
     #DEBUG
     def startAutoTrade(self):
@@ -479,6 +483,7 @@ class Window :
                         if horario in toStoreTime:
                             pass
                         else:
+                            pass
                             open(filename,'a').write(horario + ',' + par + ','+ catalogacao[par][horario]['dir'].strip() + ','+ str(timeframe) +'\n') #10:00,EURUSD,CALL
                         
                         toStoreTime.append(horario) #add each time to array
@@ -707,7 +712,9 @@ class Window :
 
         #check if theres a signals
         if len(signals_list) == 0 :
-            self.alert('Aviso','Do momento, sem sinais disponiveis por operar!')
+            #self.alert('Aviso','Do momento, sem sinais disponiveis por operar!')
+            self.tela.label_logging.setText('Do momento, sem sinais disponiveis por operar!')
+
             self.stopAutoTrade()
         else:
             self.showToaster('Robo em processo, aguarde!')
