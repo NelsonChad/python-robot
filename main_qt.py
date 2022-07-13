@@ -1,4 +1,4 @@
-from PyQt5 import uic, QtWidgets, QtGui, QtCore, QtSvg
+from PyQt5 import uic, QtWidgets, QtGui, QtCore
 from concurrent.futures import process
 from time import sleep
 from fileinput import filename
@@ -65,7 +65,8 @@ class Window :
         '''
             DEFENITIONS OF THE APP
         '''
-        #self.loginUI.label_logo.setGeometry(50, 50, 50, 50)
+        self.tela.setFixedSize(1123, 732)
+
         pixmap = QtGui.QPixmap(os.getcwd() + "/resources\logo.png")
         self.loginUI.label_logo.setPixmap(pixmap)
         self.loginUI.label_logo.resize(103,100)
