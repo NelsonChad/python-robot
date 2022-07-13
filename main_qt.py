@@ -571,7 +571,8 @@ class Window :
                         #updated money
                         self.DAY_LOSS_TARGET += lucro
                         self.TRADE_PROFIT = 0
-                        self.SOROS_HAND = float(Entrada) #reset the soros to 1th hand
+                        #self.SOROS_HAND = float(Entrada) #reset the soros to 1th hand
+                        self.SOROS_HAND = 0 #reset the soros to 1th hand
                         print('SALDO ACTUAL: ', self.DAY_LOSS_TARGET)
                     else:
                         print(Fore.GREEN+"Voce ganhou "+str(lucro)+"$")
@@ -616,12 +617,12 @@ class Window :
         print('WINS: '+ Fore.GREEN + str(self.WINS) + Fore.RESET + ' LOSES: ' + Fore.RED + str(self.LOSES)+ Fore.RESET)
         print('\nINROW WINS: '+ Fore.GREEN + str(self.INROW_WINS) + Fore.RESET + ' INROW LOSES: ' + Fore.RED + str(self.INROW_LOSES)+ Fore.RESET)
 
-        if self.INROW_WINS >= 3:
+        if self.INROW_WINS >= int(self.tela.comboBoxTimeframe.currentText()):
             print( Fore.GREEN +'!!! META BATIDA !!!')
             #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
             os._exit(1)
             return
-        if self.INROW_LOSES >= 3:
+        if self.INROW_LOSES >= int(self.tela.comboBoxTimeframe.currentText()):
             print( Fore.RED +'!!! ESTOPADO !!!')
             #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
             os._exit(1)
