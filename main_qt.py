@@ -617,12 +617,12 @@ class Window :
         print('WINS: '+ Fore.GREEN + str(self.WINS) + Fore.RESET + ' LOSES: ' + Fore.RED + str(self.LOSES)+ Fore.RESET)
         print('\nINROW WINS: '+ Fore.GREEN + str(self.INROW_WINS) + Fore.RESET + ' INROW LOSES: ' + Fore.RED + str(self.INROW_LOSES)+ Fore.RESET)
 
-        if self.INROW_WINS >= int(self.tela.comboBoxTimeframe.currentText()):
+        if self.INROW_WINS >= int(self.tela.comboBoxSorosLevel.currentText()):
             print( Fore.GREEN +'!!! META BATIDA !!!')
             #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
             os._exit(1)
             return
-        if self.INROW_LOSES >= int(self.tela.comboBoxTimeframe.currentText()):
+        if self.INROW_LOSES >= int(self.tela.comboBoxSorosLevel.currentText()):
             print( Fore.RED +'!!! ESTOPADO !!!')
             #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
             os._exit(1)
