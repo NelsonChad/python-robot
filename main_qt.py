@@ -435,10 +435,10 @@ class Window :
             print('INICIANDO CATALOGACAO')
             self.tela.label_logging.setText('gerando sinais, por favor espere ...')
 
-            timeframe = 5
+            timeframe = 1
             dias = 10
             percentage = 80
-            soros = 3
+            soros = int(self.tela.comboBoxSorosLevel.currentText())
 
             per_call = abs(percentage) #abs modulo
             per_put = abs(100 - percentage)
