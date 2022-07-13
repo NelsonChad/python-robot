@@ -441,7 +441,7 @@ class Window :
             self.tela.label_logging.setText('gerando sinais, por favor espere ...')
 
             timeframe = int(self.tela.comboBoxTimeframe.currentText())
-            dias = 10
+            dias = 10 
             percentage = 80
             soros = int(self.tela.comboBoxSorosLevel.currentText())
 
