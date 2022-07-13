@@ -75,6 +75,7 @@ class Window :
         self.disable()
         self.tela.comboBoxAccountType.addItems(['DEMO','REAL'])
         self.tela.comboBoxSorosLevel.addItems(['2','3'])
+        self.tela.comboBoxTimeframe.addItems(['1','5','15'])
         self.loginUI.lineEditPassword.setEchoMode(QtWidgets.QLineEdit.Password)
 
         #Debug
@@ -238,6 +239,7 @@ class Window :
         self.tela.pushButtonStartTrade.setEnabled(False)
         self.tela.pushButtonExit.setEnabled(False)
         self.tela.comboBoxAccountType.setEnabled(False)
+        self.tela.comboBoxTimeframe.setEnabled(False)
         self.tela.comboBoxSorosLevel.setEnabled(False)
         self.tela.textEditStoploss.setEnabled(False)
 
@@ -252,6 +254,8 @@ class Window :
         self.tela.comboBoxAccountType.setEnabled(True)
         self.tela.comboBoxSorosLevel.setEnabled(True)
         self.tela.textEditStoploss.setEnabled(True)
+        self.tela.comboBoxTimeframe.setEnabled(True)
+
 
     def dialog(title, message):
         dlg = QtWidgets.QDialog()
@@ -303,6 +307,7 @@ class Window :
         self.tela.pushButtonStartTrade.setEnabled(False)
         self.tela.pushButtonStartTrade.setVisible(False)
         self.tela.comboBoxAccountType.setEnabled(False)
+        self.tela.comboBoxTimeframe.setEnabled(False)
 
         self.loading() #call loading
         #self.start_catalog()
@@ -435,7 +440,7 @@ class Window :
             print('INICIANDO CATALOGACAO')
             self.tela.label_logging.setText('gerando sinais, por favor espere ...')
 
-            timeframe = 1
+            timeframe = int(self.tela.comboBoxTimeframe.currentText())
             dias = 10
             percentage = 80
             soros = int(self.tela.comboBoxSorosLevel.currentText())
@@ -629,9 +634,11 @@ class Window :
         print('|=================================================================|')
 
     #soros method
+    i= 0
     def soros(self, won):
+        self.i+=1
         self.SOROS_HAND = self.SOROS_HAND + won
-        print('MAO DE SOROS',float(self.SOROS_HAND))
+        print(self.i,'a MAO DE SOROS ',float(self.SOROS_HAND))
         return float(self.SOROS_HAND)
 
     #managment method
