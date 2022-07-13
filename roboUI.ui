@@ -339,7 +339,7 @@ QComboBox {
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(145, 145, 145);</string>
+         <string notr="true">color: rgb(0, 255, 0);</string>
         </property>
         <property name="text">
          <string/>
