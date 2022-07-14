@@ -96,14 +96,6 @@ class Window :
         stylesheet = "::section{Background-color: rgb(0, 168, 132);color: rgb(255,255,255);}"
         self.tela.tableWidgetOps.horizontalHeader().setStyleSheet(stylesheet)
 
-        '''
-        self.tela.tableWidgetOps.setColumnWidth(0,215) # and also lower values
-        self.tela.tableWidgetOps.setColumnWidth(1,216) # and also lower values
-        self.tela.tableWidgetOps.setColumnWidth(2,216) # and also lower values
-        self.tela.tableWidgetOps.setColumnWidth(3,216) # and also lower values
-        self.tela.tableWidgetOps.setColumnWidth(4,216) # and also lower values
-        '''
-
         self.tela.tableWidgetBooked.setColumnCount(3)
         self.tela.tableWidgetBooked.setHorizontalHeaderLabels(["HORÁRIO","PARIDADE", "EXPIRAÇÃO"])
         stylesheet = "::section{Background-color: rgb(0, 168, 132);color: rgb(255,255,255);}"
@@ -271,6 +263,11 @@ class Window :
         dlg.setWindowTitle(message)
         dlg.exec()
 
+    def reportScreen(title, message):
+        dlg = QtWidgets.QDialog()
+        dlg.setWindowTitle(message)
+        dlg.exec()
+
     def alert(self, title, message):
         alert = QtWidgets.QMessageBox()
         alert.setIcon(QtWidgets.QMessageBox.Warning)
@@ -324,16 +321,14 @@ class Window :
         #self.start_catalog()
         # DEBUG
     
-        self.management(3)
+        '''self.management(3)
         self.schedule_with_File('signals_2022-05-21_1M.txt')
-        
+        '''
 
         #PRODUCTION
-        '''
         thread = threading.Thread(target=self.start_catalog, args=())
         thread.daemon = True
         thread.start()
-        '''
         
     def stopAutoTrade(self):
         print('STOPPING TRADING...')
