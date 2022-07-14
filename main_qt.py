@@ -25,6 +25,10 @@ class Window :
     name =''
     spinner = None #to loading spinner
 
+    storeThreads: None
+    storeSchedsEvents = []
+    storeScheds = []
+
     operations = 0
 
     FILEPATH = None
@@ -51,6 +55,7 @@ class Window :
     EMPATE = 0
 
     API = None
+
     
     '''
         USER INTERFACE finctions  begin here
@@ -66,6 +71,7 @@ class Window :
             DEFENITIONS OF THE APP
         '''
         self.tela.setFixedSize(1123, 732)
+        self.loginUI.setFixedSize(491, 369)
 
         pixmap = QtGui.QPixmap(os.getcwd() + "/resources\logo.png")
         self.loginUI.label_logo.setPixmap(pixmap)
@@ -203,8 +209,10 @@ class Window :
         print("text changed")
         self.updateScreen()
 
-    def kill_thread(self):
-        threading.currentThread()
+    def kill_threads(self):
+        for j in self.storeThreads:
+            #print('KILLING: ',j)
+            j.kill.set()
 
     def on_combobox_changed(self, value):
         print("combobox changed", value)
@@ -251,7 +259,7 @@ class Window :
         self.tela.pushButtonExit.setVisible(True)
 
         self.tela.pushButtonStartTrade.setEnabled(True)
-        self.tela.pushButtonExit.setEnabled(True)
+        #self.tela.pushButtonExit.setEnabled(True)
         self.tela.comboBoxAccountType.setEnabled(True)
         self.tela.comboBoxSorosLevel.setEnabled(True)
         self.tela.textEditStoploss.setEnabled(True)
@@ -309,27 +317,39 @@ class Window :
         self.tela.pushButtonStartTrade.setVisible(False)
         self.tela.comboBoxAccountType.setEnabled(False)
         self.tela.comboBoxTimeframe.setEnabled(False)
+        self.tela.pushButtonExit.setEnabled(True)
+
 
         self.loading() #call loading
         #self.start_catalog()
         # DEBUG
-        '''
+    
         self.management(3)
         self.schedule_with_File('signals_2022-05-21_1M.txt')
-        '''
+        
 
         #PRODUCTION
+        '''
         thread = threading.Thread(target=self.start_catalog, args=())
         thread.daemon = True
         thread.start()
+        '''
         
     def stopAutoTrade(self):
         print('STOPPING TRADING...')
+
+        self.stopJods()
         self.tela.pushButtonStartTrade.setEnabled(True) 
         self.tela.pushButtonStartTrade.setVisible(True) 
-        self.spinner.stop() # stops spinning  
+        self.tela.pushButtonExit.setEnabled(False)
 
-        #self.kill_thread()   
+        self.spinner.stop() # stops spinning
+
+        self.kill_threads()
+
+        self.storeSchedsEvents = []
+        self.storeScheds = []
+   
 
 
     '''
@@ -620,17 +640,22 @@ class Window :
 
         if self.INROW_WINS >= int(self.tela.comboBoxSorosLevel.currentText()):
             print( Fore.GREEN +'!!! META BATIDA !!!')
-            #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
-            os._exit(1)
+            self.stopAutoTrade() #stop all jobs
+            #self.alert('PARABENS!','!!! META BATIDA !!!')
+            self.tela.label_logging.setText("!!! META BATIDA !!!")
             return
         if self.INROW_LOSES >= int(self.tela.comboBoxSorosLevel.currentText()):
             print( Fore.RED +'!!! ESTOPADO !!!')
-            #print ("KILL MAIN THREAD: %s" % threading.current_thread().ident)
-            os._exit(1)
+            self.stopAutoTrade() #stop all jobs
+            self.tela.label_logging.setText("!!! ESTOPADO !!!")
+            #self.alert('Ooops!','!!! ESTOPADO !!! \n Volta a tentar amanha!')
             return
         if round(self.DAY_LOSS_TARGET) <= 0 :
             print( Fore.RED +'!!! ESTOPADO !!!')
-            os._exit(1)
+            self.stopAutoTrade() #stop all jobs
+            self.tela.label_logging.setText("!!! ESTOPADO !!!")
+            #self.alert('Ooops!','!!! ESTOPADO !!! \n Volta a tentar amanha!')
+            #os._exit(1)
             return
 
         print('|=================================================================|')
@@ -711,12 +736,14 @@ class Window :
                 print('|----------------------------------------------------------------------|')
 
                 job.append(x)
+                self.storeThreads = job #store threads
                 signals_list.append(signal)
             i = i + 1
 
         print('************************ ',len(signals_list),' Sinais Agendados**************************')
             
         for j in job:
+            j.kill = threading.Event()
             j.start()
 
         # to fill List view
@@ -738,11 +765,21 @@ class Window :
     #do the job
     def run(self, Entrada,Paridade,Direcao,Duracao,Hora):
         sch = sched.scheduler(time.time, time.sleep)
-        sch.enterabs(Hora, 1, self.buyBinaryListFile, (Entrada,Paridade,Direcao,Duracao,Hora))
+        self.storeScheds.append(sch) #store scheds
+
+        event = sch.enterabs(Hora, 1, self.buyBinaryListFile, (Entrada,Paridade,Direcao,Duracao,Hora))
+        self.storeSchedsEvents.append(event) #store scheds events
         sch.run()
 
+
     def stopJods(self):
-        sched.scheduler.cancel(e3)
+        total = self.WINS + self.LOSES
+        #total = 3
+        print("TTL: ", total)
+        for i, sh in enumerate(self.storeScheds):
+            if i >= total:
+                print(i, ' STOP SCHED: ',sh)
+                sh.cancel(self.storeSchedsEvents[i])
 
 #main method
 def main():
