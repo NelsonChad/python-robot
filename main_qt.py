@@ -93,7 +93,7 @@ class Window :
         #Debug
         self.loginUI.textEditEmail.setText('tonnylson.chad@gmail.com')
         self.loginUI.lineEditPassword.setText('nelsonchad1234')
-        self.tela.textEditStoploss.setPlainText('20')
+        self.tela.textEditStoploss.setPlainText('5')
 
         #Init tables
         self.tela.tableWidgetOps.setColumnCount(5)
@@ -603,7 +603,6 @@ class Window :
 
                 if(self.INROW_WINS >= 1):
                     print('SOROS: Entrada='+str(Entrada + self.TRADE_PROFIT)+' Paridade= '+Paridade+' Dir= '+Direcao+' Duracao= '+str(Duracao))
-                    #stt, id = self.API.buy(float(self.soros(self.TRADE_PROFIT)), Paridade, str(Direcao).lower(), int(Duracao))
                     stt, id = self.API.buy(float(Entrada + self.TRADE_PROFIT), Paridade, str(Direcao).lower(), int(Duracao))
                 else:
                     print('Entrada='+str(Entrada)+' Paridade= '+Paridade+' Dir= '+Direcao+' Duracao= '+str(Duracao))
@@ -719,15 +718,6 @@ class Window :
             #os._exit(1)
 
         print('|=================================================================|')
-
-    #soros method
-    i= 0
-    def soros(self, won):
-        self.i += 1
-        print('TO SOROS ',won)
-        self.SOROS_HAND = self.SOROS_HAND + won
-        print(self.i,'a MAO DE SOROS ',float(self.SOROS_HAND))
-        return float(self.SOROS_HAND)
 
     #managment method
     def management(self, _soros):
