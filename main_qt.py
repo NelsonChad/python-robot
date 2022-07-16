@@ -25,9 +25,12 @@ class Window :
     name =''
     spinner = None #to loading spinner
 
-    storeThreads: None
+    storeThreads = []
     storeSchedsEvents = []
     storeScheds = []
+    dayTradeStatus = 0
+    dayTradeStatus = 0
+    dayTradeFinish = False
 
     operations = 0
 
@@ -61,9 +64,10 @@ class Window :
         USER INTERFACE finctions  begin here
     '''
 
-    app = QtWidgets.QApplication([])
+    app = QtWidgets.QApplication(sys.argv)
     tela = uic.loadUi("roboUI.ui")
     loginUI = uic.loadUi("login.ui")
+    reportUI = uic.loadUi("report.ui")
 
     PROFILE = None
     def __init__(self):
@@ -72,6 +76,7 @@ class Window :
         '''
         self.tela.setFixedSize(1123, 732)
         self.loginUI.setFixedSize(491, 369)
+        self.reportUI.setFixedSize(648, 453)
 
         pixmap = QtGui.QPixmap(os.getcwd() + "/resources\logo.png")
         self.loginUI.label_logo.setPixmap(pixmap)
@@ -111,6 +116,9 @@ class Window :
         self.tela.pushButtonStartTrade.clicked.connect(self.startAutoTrade)
         self.tela.pushButtonOpenLogin.clicked.connect(self.loginPage)
         self.tela.pushButtonExit.clicked.connect(self.stopAutoTrade)
+        self.reportUI.pushButtonReportExit.clicked.connect(self.closeReport)
+        self.tela.pushButtonShowReport.clicked.connect(lambda: self.reportScreen(self.dayTradeStatus))
+
 
         self.tela.comboBoxAccountType.currentIndexChanged.connect(self.on_combobox_changed)
         self.tela.textEditStoploss.textChanged.connect(self.text_changed)
@@ -236,6 +244,8 @@ class Window :
     def disable(self):
         self.tela.pushButtonStartTrade.setVisible(False)
         self.tela.pushButtonExit.setVisible(False)
+        self.tela.pushButtonShowReport.setVisible(False)
+
 
         self.tela.pushButtonStartTrade.setEnabled(False)
         self.tela.pushButtonExit.setEnabled(False)
@@ -258,15 +268,34 @@ class Window :
         self.tela.comboBoxTimeframe.setEnabled(True)
 
 
-    def dialog(title, message):
+    def dialog(self,title, message):
         dlg = QtWidgets.QDialog()
         dlg.setWindowTitle(message)
-        dlg.exec()
+        dlg.show()
 
-    def reportScreen(title, message):
-        dlg = QtWidgets.QDialog()
-        dlg.setWindowTitle(message)
-        dlg.exec()
+    def reportScreen(self, status):
+        self.reportUI.labelReportWins.setText(str(self.WINS))
+        self.reportUI.labelReportLoses.setText(str(self.LOSES))
+        self.reportUI.labelReportProfit.setText(str(10))
+        self.reportUI.labelReportTotalTrades.setText(str(self.WINS + self.LOSES))
+        if status == 0:
+            self.reportUI.labelReportStatus.setText('!! ESTOPADO !!')
+            self.reportUI.labelReportDayStatus.setText('Negativo')
+            self.reportUI.labelReportDayStatus.setStyleSheet('color: rgb(255, 0, 0);')
+            self.reportUI.labelReportStatus.setStyleSheet('color: rgb(255, 0, 0);')
+            self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
+        if status == 1:
+            self.reportUI.labelReportStatus.setText('!! META BATIDA !!')
+            self.reportUI.labelReportDayStatus.setText('Positivo')
+            self.reportUI.labelReportDayStatus.setStyleSheet('color: rgb(0, 255, 0);')
+            self.reportUI.labelReportStatus.setStyleSheet('color: rgb(0, 255, 0);')
+            self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
+        self.reportUI.exec()
+        
+
+    def closeReport(self):
+        self.reportUI.close()
+
 
     def alert(self, title, message):
         alert = QtWidgets.QMessageBox()
@@ -313,39 +342,61 @@ class Window :
         self.tela.pushButtonStartTrade.setEnabled(False)
         self.tela.pushButtonStartTrade.setVisible(False)
         self.tela.comboBoxAccountType.setEnabled(False)
+        self.tela.textEditStoploss.setEnabled(False)
+        self.tela.comboBoxSorosLevel.setEnabled(False)
         self.tela.comboBoxTimeframe.setEnabled(False)
         self.tela.pushButtonExit.setEnabled(True)
-
-
+        self.dayTradeFinish = False
+        #self.resetVariables()
+        
         self.loading() #call loading
         #self.start_catalog()
-        # DEBUG
-    
-        '''self.management(3)
+        # DEBUG      
+        self.management(3)
         self.schedule_with_File('signals_2022-05-21_1M.txt')
-        '''
 
         #PRODUCTION
+        '''
         thread = threading.Thread(target=self.start_catalog, args=())
         thread.daemon = True
         thread.start()
-        
-    def stopAutoTrade(self):
-        print('STOPPING TRADING...')
+        '''
 
+    def stopAutoTrade(self):
+        print('...STOPPING TRADING...')
         self.stopJods()
+        self.kill_threads()
+
         self.tela.pushButtonStartTrade.setEnabled(True) 
         self.tela.pushButtonStartTrade.setVisible(True) 
         self.tela.pushButtonExit.setEnabled(False)
-
+        self.tela.textEditStoploss.setEnabled(True)
+        self.tela.comboBoxSorosLevel.setEnabled(True)
+        self.tela.comboBoxTimeframe.setEnabled(True)
+        self.tela.pushButtonShowReport.setVisible(True)
+        
         self.spinner.stop() # stops spinning
-
-        self.kill_threads()
-
+        #self.storeSchedsEvents = []
+        #self.storeScheds = []
+    
+    def resetVariables(self):
+        print('RESET VARIABLES...')
         self.storeSchedsEvents = []
         self.storeScheds = []
-   
-
+        self.dayTradeStatus = 0
+        self.WINS = 0
+        self.LOSES = 0
+        self.INROW_LOSES = 0
+        self.INROW_WINS = 0
+        self.SOROS_HAND = 0
+        '''
+        self.ENTRADA = 0 # to save the entry 
+        self.TAKEPROFIT_PERC = 0 #percentage to risc in day $
+        self.DAY_LOSS_TARGET = 0 #money $ to risc in day according in percentage
+        self.SOROS_HAND = 0 #value of soros hand
+        self.TRADE_PROFIT = 0 #profit earned trade
+        self.TODAY_PROFIT = 0
+        '''
 
     '''
         ROBOT Functions begin here ...
@@ -410,12 +461,6 @@ class Window :
                 #print('VELAS: ',candles)
 
                 for candle in candles:
-                    
-                    '''
-                    print('Ativo: '+par+' ABERTURA: ',candle["open"], ' FEIXAMENTO: ',candle["close"], ' FROM: ',candle["from"])
-                    print(' DATA::: ' + datetime.fromtimestamp(candle['from']).strftime('%Y-%m-%d')+' ::: ')
-                    '''
-
                     if datetime.fromtimestamp(candle['from']).strftime('%Y-%m-%d') not in datas_testadas:
                         datas_testadas.append(datetime.fromtimestamp(candle['from']).strftime('%Y-%m-%d'))
                     if len(datas_testadas) <= dias:
@@ -526,6 +571,7 @@ class Window :
     #buy method
     def buyBinaryListFile(self, Entrada,Paridade,Direcao,Duracao,Hora):
         print('***************SINAL**************')
+        self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
 
         sys.stdout.write('\a')
         #print('INROW_WINS GLOBAL: ', INROW_WINS, ' INROW_LOSES GLOBAL: ', INROW_LOSES)
@@ -550,14 +596,16 @@ class Window :
             if(self.DAY_LOSS_TARGET < self.ENTRADA):
                 Entrada = self.ENTRADA - (self.ENTRADA - self.DAY_LOSS_TARGET)
 
-            if((self.ENTRADA > 1)): #Caso o payout esteja bom
+            print(Fore.YELLOW+'FINISHED?: ', self.dayTradeFinish ,''+Fore.RESET )
+            if((self.ENTRADA >= 1) and (self.dayTradeFinish == False)): #Caso o payout esteja bom
             #if(int(pay) >= int(self.PAYOUT_B)): #Caso o payout esteja bom
                 print('OPERANDO... ')
                 self.tela.label_logging.setText('OPERANDO:  Paridade: '+Paridade+' Opc: '+Direcao+' Timeframe: M'+str(Duracao)+' VALOR: '+str(Entrada))
 
                 if(self.INROW_WINS >= 1):
                     print('SOROS: Entrada='+str(Entrada + self.TRADE_PROFIT)+' Paridade= '+Paridade+' Dir= '+Direcao+' Duracao= '+str(Duracao))
-                    stt, id = self.API.buy(float(self.soros(self.TRADE_PROFIT)), Paridade, str(Direcao).lower(), int(Duracao))
+                    #stt, id = self.API.buy(float(self.soros(self.TRADE_PROFIT)), Paridade, str(Direcao).lower(), int(Duracao))
+                    stt, id = self.API.buy(float(Entrada + self.TRADE_PROFIT), Paridade, str(Direcao).lower(), int(Duracao))
                 else:
                     print('Entrada='+str(Entrada)+' Paridade= '+Paridade+' Dir= '+Direcao+' Duracao= '+str(Duracao))
                     stt, id = self.API.buy(float(Entrada), Paridade, str(Direcao).lower(), int(Duracao))
@@ -572,6 +620,7 @@ class Window :
 
                     if status == 'loose':
                         print(Fore.RED+"Voce perdeu "+str(lucro)+"$")
+                        self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
                         self.tela.label_logging.setText("Voce perdeu "+str(lucro)+"$")
 
                         op = [Paridade, Direcao, str(Duracao), lucro, 'LOSS']
@@ -587,11 +636,12 @@ class Window :
                         #updated money
                         self.DAY_LOSS_TARGET += lucro
                         self.TRADE_PROFIT = 0
-                        #self.SOROS_HAND = float(Entrada) #reset the soros to 1th hand
-                        self.SOROS_HAND = 0 #reset the soros to 1th hand
+                        self.SOROS_HAND = float(Entrada) #reset the soros to 1th hand
+                        #self.SOROS_HAND = 0 #reset the soros to 1th hand
                         print('SALDO ACTUAL: ', self.DAY_LOSS_TARGET)
                     else:
                         print(Fore.GREEN+"Voce ganhou "+str(lucro)+"$")
+                        self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
                         self.tela.label_logging.setText("Voce ganhou "+str(lucro)+"$")
                         #self.tela.listWidgetTrades.addItem(Paridade+'  '+Direcao+'  M'+str(Duracao)+'  '+str(Entrada)+'$' + ' WIN') #add to ListView
 
@@ -617,12 +667,23 @@ class Window :
                     break
                 else:
                     print(Fore.RED+"Por favor, tente novamente: ",id,''+ Fore.RESET)
+                    self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
                     self.tela.label_logging.setText("Por favor, tente novamente: "+str(id))
                     break
                     # Fim IF
             else:
-                print('NAO OPERAVEL ' + str(self.PAYOUT))
-                self.tela.label_logging.setText("Erro, Payout ou valor de entrada insuficiente")
+                if self.dayTradeFinish:
+                    print('=========================OPERACAO TERMINOU==============================')
+                    self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
+                    self.tela.label_logging.setText("!!! META BATIDA !!!")
+                    self.stopJods()
+                    self.kill_threads()
+                    break
+                else:    
+                    print('=========================NAO OPERAVEL ' + str(self.PAYOUT), '========================')
+                    self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
+                    self.tela.label_logging.setText("Erro, Payout ou valor de entrada insuficiente")
+                    break
         
         self.tela.labelWins.setText(str(self.WINS))
         self.tela.labelLoses.setText(str(self.LOSES))
@@ -634,31 +695,37 @@ class Window :
         print('\nINROW WINS: '+ Fore.GREEN + str(self.INROW_WINS) + Fore.RESET + ' INROW LOSES: ' + Fore.RED + str(self.INROW_LOSES)+ Fore.RESET)
 
         if self.INROW_WINS >= int(self.tela.comboBoxSorosLevel.currentText()):
-            print( Fore.GREEN +'!!! META BATIDA !!!')
+            self.dayTradeFinish = True
+            print( Fore.GREEN +'!!! META BATIDA !!!'+ Fore.RESET)
             self.stopAutoTrade() #stop all jobs
-            #self.alert('PARABENS!','!!! META BATIDA !!!')
             self.tela.label_logging.setText("!!! META BATIDA !!!")
-            return
+            self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
+            self.dayTradeStatus = 1
+
         if self.INROW_LOSES >= int(self.tela.comboBoxSorosLevel.currentText()):
-            print( Fore.RED +'!!! ESTOPADO !!!')
+            self.dayTradeFinish = True
+            print( Fore.RED +'!!! ESTOPADO INR!!!'+ Fore.RESET)
             self.stopAutoTrade() #stop all jobs
+            self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
             self.tela.label_logging.setText("!!! ESTOPADO !!!")
-            #self.alert('Ooops!','!!! ESTOPADO !!! \n Volta a tentar amanha!')
-            return
+            self.dayTradeStatus = 0
+
         if round(self.DAY_LOSS_TARGET) <= 0 :
-            print( Fore.RED +'!!! ESTOPADO !!!')
+            self.dayTradeFinish = True
+            print( Fore.RED +'!!! ESTOPADO VB!!!'+ Fore.RESET)
             self.stopAutoTrade() #stop all jobs
+            self.tela.label_logging.setStyleSheet('color: rgb(255, 0, 0);')
             self.tela.label_logging.setText("!!! ESTOPADO !!!")
-            #self.alert('Ooops!','!!! ESTOPADO !!! \n Volta a tentar amanha!')
+            self.dayTradeStatus = 0
             #os._exit(1)
-            return
 
         print('|=================================================================|')
 
     #soros method
     i= 0
     def soros(self, won):
-        self.i+=1
+        self.i += 1
+        print('TO SOROS ',won)
         self.SOROS_HAND = self.SOROS_HAND + won
         print(self.i,'a MAO DE SOROS ',float(self.SOROS_HAND))
         return float(self.SOROS_HAND)
@@ -671,7 +738,7 @@ class Window :
             print('Entrada: $', self.ENTRADA)
 
             self.DAY_LOSS_TARGET = percent
-            self.SOROS_HAND = self.ENTRADA
+            self.SOROS_HAND = self.ENTRADA #verificar
             self.tela.labelEntrys.setText(str(self.ENTRADA))
 
         except TypeError:
@@ -748,10 +815,18 @@ class Window :
 
         #check if theres a signals
         if len(signals_list) == 0 :
-            #self.alert('Aviso','Do momento, sem sinais disponiveis por operar!')
+            self.alert('Aviso','Do momento, sem sinais disponiveis por operar!')
             self.tela.label_logging.setText('Do momento, sem sinais disponiveis por operar!')
-
-            self.stopAutoTrade()
+            
+            self.tela.pushButtonStartTrade.setEnabled(True) 
+            self.tela.pushButtonStartTrade.setVisible(True) 
+            self.tela.pushButtonExit.setEnabled(False)
+            self.tela.textEditStoploss.setEnabled(True)
+            self.tela.comboBoxSorosLevel.setEnabled(True)
+            self.tela.comboBoxTimeframe.setEnabled(True)
+            self.tela.pushButtonShowReport.setVisible(True)
+            
+            self.spinner.stop() # stops spinning
         else:
             self.showToaster('Robo em processo, aguarde!')
 
@@ -768,13 +843,22 @@ class Window :
 
 
     def stopJods(self):
-        total = self.WINS + self.LOSES
-        #total = 3
-        print("TTL: ", total)
-        for i, sh in enumerate(self.storeScheds):
-            if i >= total:
-                print(i, ' STOP SCHED: ',sh)
-                sh.cancel(self.storeSchedsEvents[i])
+        try:
+            total = self.WINS + self.LOSES
+            #total = 3
+            print("TTL TRADES: ", total)
+            print("TTL JOBS: ", len(self.storeSchedsEvents))
+            print("TTL THRD: ", len(self.storeScheds))
+            if(len(self.storeScheds) > 0):
+                for i, sh in enumerate(self.storeScheds):
+                    if i >= total:
+                        print(i, ' STOP SCHED: ',sh)
+                        sh.cancel(self.storeSchedsEvents[i])
+                        self.storeSchedsEvents.pop(i)
+        except ValueError as ve:
+            print('::::::Warning:::::: ',ve)    
+        except IndexError as ve:
+            print('::::::Warning:::::: ',ve)   
 
 #main method
 def main():

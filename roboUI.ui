@@ -1140,6 +1140,23 @@ border-radius: 15px;</string>
          <string>  WIN</string>
         </property>
        </widget>
+       <widget class="QPushButton" name="pushButtonShowReport">
+        <property name="geometry">
+         <rect>
+          <x>70</x>
+          <y>120</y>
+          <width>171</width>
+          <height>41</height>
+         </rect>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(0, 168, 132);</string>
+        </property>
+        <property name="text">
+         <string>VER RELATORIO</string>
+        </property>
+       </widget>
       </widget>
      </widget>
     </item>
