@@ -352,15 +352,14 @@ class Window :
         self.loading() #call loading
         #self.start_catalog()
         # DEBUG      
+        '''
         self.management(3)
         self.schedule_with_File('signals_2022-05-21_1M.txt')
-
-        #PRODUCTION
         '''
+        #PRODUCTION
         thread = threading.Thread(target=self.start_catalog, args=())
         thread.daemon = True
         thread.start()
-        '''
 
     def stopAutoTrade(self):
         print('...STOPPING TRADING...')
