@@ -671,11 +671,11 @@ class Window :
                     # Fim IF
             else:
                 if self.dayTradeFinish:
-                    print('=========================OPERACAO TERMINOU==============================')
+                    self.dayTradeFinish = True
+                    self.stopAutoTrade() #stop all jobs
+                    print('=========================OPERACAO TERMINOU F==============================')
                     self.tela.label_logging.setStyleSheet('color: rgb(0, 255, 0);')
-                    self.tela.label_logging.setText("!!! META BATIDA !!!")
-                    self.stopJods()
-                    self.kill_threads()
+                    self.tela.label_logging.setText("!!! META BATIDA F!!!")
                     break
                 else:    
                     print('=========================NAO OPERAVEL ' + str(self.PAYOUT), '========================')
@@ -832,6 +832,7 @@ class Window :
 
 
     def stopJods(self):
+        self.tela.pushButtonStartTrade.setVisible(False)
         try:
             total = self.WINS + self.LOSES
             #total = 3
